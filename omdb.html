@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Search Website</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .header {
+            background-color: #b71c1c;
+            width: 100%;
+            padding: 15px 0;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            color: #fff;
+        }
+        .search-container {
+            margin: 20px 0;
+            width: 50%;
+        }
+        .search-input {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .movie-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .movie-card {
+            background-color: #1f1f1f;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            width: 200px;
+            text-align: center;
+        }
+        .movie-card img {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .movie-card h3 {
+            margin: 10px 0 5px;
+            font-size: 18px;
+            color: #e53935;
+        }
+        .movie-card p {
+            font-size: 14px;
+            color: #c7c7c7;
+        }
+        #pagination {
+            display: flex;
+            justify-content: center;
+            list-style-type: none;
+            margin-top: 20px;
+          }
+      
+          #pagination>li {
+            margin: 0px 5px;
+            padding: 10px;
+            background-color: teal;
+            cursor: pointer;
+            color: white;
+          }
+        .data{
+            border: 2px solid black;
+            border-radius: 20px;
+            width: 20vw;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Movie Search</h1>
+    </div>
+    <div class="search-container">
+        <input type="text" id="searchInput" class="search-input" placeholder="Search for a movie..." onkeyup="fetchData()">
+    </div>
+    <ul id="pagination">
+        
+    </ul>
+    <div class="movie-container" id="movieContainer"></div>
+
+    <script>
+        let sampleMovies;
+        let query;
+        let filterData=[];
+        let currentPage=1;
+        let limit=5;
+
+        function displayData(){
+            let start=(currentPage-1)*limit;
+        let end=start+limit;
+        console.log(start,end)
+        let paginatedData=[];
+        console.log(sampleMovies)
+        sampleMovies.map((ele)=>{
+            paginatedData=sampleMovies[0].map(ele=> ele.slice(start,end))
+        })
+        console.log(paginatedData)
+            const movieContainer = document.getElementById('movieContainer');
+            movieContainer.innerHTML = '';
+                if (paginatedData.length > 0) {
+                    console.log(paginatedData[1])
+                    paginatedData[1].forEach(movie=> {
+                        console.log("hi",movie)
+                            const movieCard = document.createElement('div');
+                            movieCard.classList.add('movie-card');
+                             
+                            movieCard.innerHTML = `
+                                <img src="${movie.Poster}" alt="${movie.Title}">
+                                <h3>${movie.Title}</h3>
+                                <p><strong>Year:</strong> ${movie.Year}</p>
+                            `;
+                            movieContainer.appendChild(movieCard);
+                    })
+                } else {
+                    movieContainer.innerHTML = '<p>No movies found.</p>';
+                }
+        }
+        function fetchData() {
+            
+            query = document.getElementById('searchInput').value;
+            
+            let cred={
+                apikey:"133665c3",
+                s:query
+            }
+            fetch(`http://www.omdbapi.com/?apikey=133665c3&s=${query}&page=5`)
+            .then((res)=>res.json())
+            .then((data)=>{
+                sampleMovies=Object.entries(data);
+                console.log(sampleMovies)
+                setPagination()
+                displayData();
+            })
+            
+            
+            
+        }
+        function setPagination(){
+            let moviesCount;
+            sampleMovies.map((ele)=>{
+                moviesCount=(ele[0].length)
+            });
+            console.log(moviesCount)
+            let pageCount=Math.ceil(moviesCount/limit);
+            console.log(pageCount)
+            document.querySelector("#pagination").innerHTML="";
+            for(let i=1;i<=pageCount;i++){
+                let pageItem=document.createElement("li");
+                
+                pageItem.innerHTML=i;
+                pageItem.addEventListener("click",function(){
+                    currentPage=i;
+                    sampleMovies.map((ele)=>{
+                        searchResults=ele[1].sort((ele)=>{
+                            displayData();
+                    })
+                    })
+                    
+                })
+                
+                document.querySelector("ul").append(pageItem)
+            }
+        }
+    </script>
+</body>
+</html>
